@@ -2,7 +2,8 @@
   "name": "scratch-webpack-configuration",
   "version": "1.0.0",
   "description": "Shared configuration for Scratch's use of webpack",
-  "main": "src/index.js",
+  "main": "src/index.cjs",
+  "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +20,13 @@
   "bugs": {
     "url": "https://github.com/scratchfoundation/scratch-webpack-configuration/issues"
   },
-  "homepage": "https://github.com/scratchfoundation/scratch-webpack-configuration#readme"
+  "homepage": "https://github.com/scratchfoundation/scratch-webpack-configuration#readme",
+  "peerDependencies": {
+    "@babel/preset-env": "^7.24.0",
+    "babel-loader": "^9.1.3",
+    "webpack": "^5.90.3"
+  },
+  "dependencies": {
+    "lodash.defaultsdeep": "^4.6.1"
+  }
 }
