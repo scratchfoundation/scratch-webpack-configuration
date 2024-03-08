@@ -1,0 +1,23 @@
+{
+  "name": "scratch-webpack-configuration",
+  "version": "1.0.0",
+  "description": "Shared configuration for Scratch's use of webpack",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scratchfoundation/scratch-webpack-configuration.git"
+  },
+  "keywords": [
+    "Scratch",
+    "webpack"
+  ],
+  "author": "Scratch Foundation",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/scratchfoundation/scratch-webpack-configuration/issues"
+  },
+  "homepage": "https://github.com/scratchfoundation/scratch-webpack-configuration#readme"
+}
