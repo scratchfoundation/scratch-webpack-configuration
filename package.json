@@ -26,9 +26,9 @@
     "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.12",
-    "jest": "^29.7.0",
-    "webpack": "^5.90.3"
+    "@types/jest": "29.5.12",
+    "jest": "29.7.0",
+    "webpack": "5.90.3"
   },
   "peerDependencies": {
     "@babel/preset-env": "^7.24.0",
