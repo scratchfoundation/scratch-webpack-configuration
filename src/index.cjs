@@ -1,89 +1,153 @@
-const defaultsDeep = require('lodash.defaultsdeep');
+const merge = require('lodash.merge');
 const path = require('path');
 
 /**
- * Make a new webpack configuration object, optionally adding settings to the default configuration.
- * If you need to override a default setting -- for example, completely replacing the `output.library` field -- do
- * that as a separate step after calling this function.
- *
- * Recommended settings include:
- *
- * | Field                           | Description                                   | Example                      |
- * | ------------------------------- | --------------------------------------------- | ---------------------------- |
- * | `additions.target`              | The target environment for this configuration | `node`, `browserslist`, etc. |
- * | `additions.output.library.name` | Your library's name                           | `scratch-foo`                |
- * | `additions.output.path`         | The output directory for this target          | `dist/web`                   |
- *
- * NOTE: The optional `mode` field is treated specially. The `NODE_ENV` environment variable will override any `mode`
- * field in the `additions` parameter.
- *
- * @param {object} options Options for the webpack configuration.
- * @param {string} options.srcPath The absolute path containing the source files.
- * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
- * @param {import('webpack').Configuration} [options.additions] Settings to add to the base configuration.
- * Aggregates like plugins and module rules will be added to the corresponding properties in the base configuration.
- * @returns {import('webpack').Configuration} a newly-built webpack configuration.
+ * @typedef {import('webpack').Configuration} Configuration
+ * @typedef {import('webpack').RuleSetRule} RuleSetRule
+ * @typedef {import('webpack').WebpackPluginFunction} WebpackPluginFunction
+ * @typedef {import('webpack').WebpackPluginInstance} WebpackPluginInstance
+*/
+
+/**
+ * @param {string|URL} [path] A file path as a string or `file://` URL.
+ * @returns {string|undefined} The file path as a string, or `undefined` if `path` is not a string or `file://` URL.
  */
-const makeWebpackConfig = ({srcPath, libraryName, additions}) => {
-    const isProduction = (process.env.NODE_ENV ?? additions?.mode) === 'production';
-    const mode = isProduction ? 'production' : 'development';
+const toPath = path => {
+    if (typeof path === 'string') {
+        return path;
+    }
+    if (path?.protocol === 'file:') {
+        return path.pathname;
+    }
+};
+
+class ScratchWebpackConfigBuilder {
+    /**
+     * @param {object} options Options for the webpack configuration.
+     * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
+     * @param {string|URL} options.rootPath The absolute path to the project root.
+     * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
+     * @param {string|URL} [options.distPath] The absolute path to build output. Defaults to `dist` under `rootPath`.
+     */
+    constructor ({libraryName, rootPath, srcPath, distPath}) {
+        const isProduction = process.env.NODE_ENV === 'production';
+        const mode = isProduction ? 'production' : 'development';
+
+        this._rootPath = toPath(rootPath) || '.'; // '.' will cause a webpack error since src must be absolute
+        this._srcPath = toPath(srcPath) ?? path.resolve(this._rootPath, 'src');
+        this._distPath = toPath(distPath) ?? path.resolve(this._rootPath, 'dist');
+
+        /**
+         * @type {Configuration}
+         */
+        this._config = {
+            mode,
+            devtool: 'cheap-module-source-map',
+            entry: libraryName ? {
+                [libraryName]: path.resolve(this._srcPath, 'index')
+            } : path.resolve(this._srcPath, 'index'),
+            optimization: {
+                minimize: isProduction
+            },
+            output: {
+                clean: true,
+                filename: '[name].js',
+                path: this._distPath,
+                library: {
+                    name: libraryName,
+                    type: 'umd2'
+                }
+            },
+            module: {
+                rules: [{
+                    include: this._srcPath,
+                    test: /\.jsx?$/,
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            // Use the browserslist setting from package.json
+                            '@babel/preset-env'
+                        ]
+                    }
+                }]
+            },
+            plugins: []
+        };
+    }
 
     /**
-     * @type {import('webpack').Configuration}
+     * @returns {Configuration} a copy of the current configuration object.
      */
-    const baseConfig = {
-        mode,
-        devtool: 'cheap-module-source-map',
-        entry: libraryName ? {
-            [libraryName]: path.resolve(srcPath, 'index')
-        } : path.resolve(srcPath, 'index'),
-        optimization: {
-            minimize: isProduction
-        },
-        output: {
-            clean: true,
-            filename: '[name].js',
-            library: {
-                name: libraryName,
-                type: 'umd2'
-            }
-        },
-        module: {
-            rules: [{
-                include: srcPath,
-                test: /\.jsx?$/,
-                loader: 'babel-loader',
-                options: {
-                    presets: [
-                        // Use the browserslist setting from package.json
-                        '@babel/preset-env'
-                    ]
+    get() {
+        return merge({}, this._config);
+    }
+
+    /**
+     * Merge new settings into the current configuration object, overriding existing values.
+     * @param {Configuration} overrides Settings to apply.
+     * @returns {this}
+     */
+    merge(overrides) {
+        merge(this._config, overrides);
+        return this;
+    }
+
+    /**
+     * Set the target environment for this configuration.
+     * @param {string} target The target environment, like `node`, `browserslist`, etc.
+     * @returns {this}
+     */
+    setTarget(target) {
+        this._config.target = target;
+
+        if (target.startsWith('node')) {
+            this.merge({
+                externalsPresets: {node: true},
+                output: {
+                    path: path.resolve(this._distPath, 'node')
                 }
-            }]
-        },
-        plugins: []
-    };
+            });
+        } else if (target === 'browserslist') {
+            this.merge({
+                externalsPresets: {web: true},
+                output: {
+                    path: path.resolve(this._distPath, 'web')
+                }
+            });
+        }
 
-    // Merge in scalar fields from `additions` into the base config
-    // This also overrides things like `plugins`, but we'll fix that later
-    const configuration = defaultsDeep({}, baseConfig, additions);
+        return this;
+    }
 
-    // Append base array fields with values from `additions`
-    defaultsDeep(configuration, {
-        module: {
-            rules: [
-                ...(baseConfig?.module?.rules ?? []),
-                ...(additions?.module?.rules ?? [])
+    /**
+     * Add a new rule to `module.rules` in the current configuration object.
+     * @param {RuleSetRule} rule The rule to add.
+     * @returns {this}
+     */
+    addModuleRule(rule) {
+        return this.merge({
+            module: {
+                rules: [
+                    ...(this._config?.module?.rules ?? []),
+                    rule
+                ]
+            }
+        });
+    }
+
+    /**
+     * Add a new plugin to `plugins` in the current configuration object.
+     * @param {WebpackPluginInstance|WebpackPluginFunction} plugin The plugin to add.
+     * @returns {this}
+     */
+    addPlugin(plugin) {
+        return this.merge({
+            plugins: [
+                ...(this._config?.plugins ?? []),
+                plugin
             ]
-        },
-        plugins: [
-            ...(baseConfig?.plugins ?? []),
-            ...(additions?.plugins ?? [])
-        ]
-    });
-
-    // All done!
-    return configuration;
+        });
+    }
 }
 
-module.exports = makeWebpackConfig;
+module.exports = ScratchWebpackConfigBuilder;

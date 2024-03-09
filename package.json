@@ -27,6 +27,6 @@
     "webpack": "^5.90.3"
   },
   "dependencies": {
-    "lodash.defaultsdeep": "^4.6.1"
+    "lodash.merge": "^4.6.2"
   }
 }
