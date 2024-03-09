@@ -110,7 +110,7 @@ class ScratchWebpackConfigBuilder {
                     path: path.resolve(this._distPath, 'node')
                 }
             });
-        } else if (target === 'browserslist') {
+        } else if (target.startsWith('browserslist')) {
             this.merge({
                 externalsPresets: {web: true},
                 output: {
