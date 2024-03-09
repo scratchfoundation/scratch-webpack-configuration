@@ -35,6 +35,7 @@ class ScratchWebpackConfigBuilder {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
+        this._libraryName = libraryName;
         this._rootPath = toPath(rootPath) || '.'; // '.' will cause a webpack error since src must be absolute
         this._srcPath = toPath(srcPath) ?? path.resolve(this._rootPath, 'src');
         this._distPath = toPath(distPath) ?? path.resolve(this._rootPath, 'dist');
@@ -75,6 +76,18 @@ class ScratchWebpackConfigBuilder {
             },
             plugins: []
         };
+    }
+
+    /**
+     * @returns {ScratchWebpackConfigBuilder} a copy of the current configuration builder.
+     */
+    clone() {
+        return new ScratchWebpackConfigBuilder({
+            libraryName: this._libraryName,
+            rootPath: this._rootPath,
+            srcPath: this._srcPath,
+            distPath: this._distPath
+        }).merge(this._config);
     }
 
     /**
