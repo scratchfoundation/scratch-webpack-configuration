@@ -27,6 +27,7 @@
     "webpack": "^5.90.3"
   },
   "dependencies": {
-    "lodash.merge": "^4.6.2"
+    "lodash.merge": "^4.6.2",
+    "webpack-node-externals": "^3.0.0"
   }
 }

@@ -1,5 +1,7 @@
-const merge = require('lodash.merge');
 const path = require('path');
+
+const merge = require('lodash.merge');
+const nodeExternals = require('webpack-node-externals');
 
 /**
  * @typedef {import('webpack').Configuration} Configuration
@@ -103,6 +105,7 @@ class ScratchWebpackConfigBuilder {
         if (target.startsWith('node')) {
             this.merge({
                 externalsPresets: {node: true},
+                externals: [nodeExternals()],
                 output: {
                     path: path.resolve(this._distPath, 'node')
                 }
