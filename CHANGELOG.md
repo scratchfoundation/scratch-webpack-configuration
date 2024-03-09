@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.0.0...v1.1.0) (2024-03-09)
+
+
+### Features
+
+* add clone() method ([c2f5451](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/c2f5451022f99951dd0a1725f5fb752514882229))
+
 # 1.0.0 (2024-03-09)
 
 
