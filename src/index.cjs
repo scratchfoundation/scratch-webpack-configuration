@@ -26,12 +26,13 @@ const toPath = path => {
 class ScratchWebpackConfigBuilder {
     /**
      * @param {object} options Options for the webpack configuration.
-     * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} options.rootPath The absolute path to the project root.
-     * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
      * @param {string|URL} [options.distPath] The absolute path to build output. Defaults to `dist` under `rootPath`.
+     * @param {boolean} [options.enableReact] Whether to enable React and JSX support.
+     * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
+     * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
      */
-    constructor ({libraryName, rootPath, srcPath, distPath}) {
+    constructor ({distPath, enableReact, libraryName, rootPath, srcPath}) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
@@ -64,12 +65,14 @@ class ScratchWebpackConfigBuilder {
             module: {
                 rules: [{
                     include: this._srcPath,
-                    test: /\.jsx?$/,
+                    test: enableReact ? /\.jsx?$/ : /\.js$/,
                     loader: 'babel-loader',
                     options: {
                         presets: [
-                            // Use the browserslist setting from package.json
-                            '@babel/preset-env'
+                            '@babel/preset-env',
+                            ...(
+                                enableReact ? ['@babel/preset-react'] : []
+                            )
                         ]
                     }
                 }]
