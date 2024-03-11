@@ -64,7 +64,6 @@ class ScratchWebpackConfigBuilder {
             },
             module: {
                 rules: [{
-                    include: this._srcPath,
                     test: enableReact ? /\.jsx?$/ : /\.js$/,
                     loader: 'babel-loader',
                     options: {
