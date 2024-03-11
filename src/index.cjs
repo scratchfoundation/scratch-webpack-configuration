@@ -62,9 +62,24 @@ class ScratchWebpackConfigBuilder {
                     type: 'umd2'
                 }
             },
+            resolve: {
+                extensions: [
+                    '.mjs',
+                    '.cjs',
+                    ...(
+                        enableReact ? [
+                            '.mjsx',
+                            '.cjsx',
+                            '.jsx'
+                        ] : []
+                    ),
+                    // defaults ('.js', '.json', etc.)
+                    '...'],
+                modules: [this._srcPath, 'node_modules']
+            },
             module: {
                 rules: [{
-                    test: enableReact ? /\.jsx?$/ : /\.js$/,
+                    test: enableReact ? /\.[cm]?jsx?$/ : /\.[cm]?js$/,
                     loader: 'babel-loader',
                     options: {
                         presets: [
