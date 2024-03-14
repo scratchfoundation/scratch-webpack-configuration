@@ -73,9 +73,10 @@ class ScratchWebpackConfigBuilder {
                             '.jsx'
                         ] : []
                     ),
-                    // defaults ('.js', '.json', etc.)
-                    '...'],
-                modules: [this._srcPath, 'node_modules']
+                    // webpack supports '...' to include defaults, but eslint does not
+                    '.js',
+                    '.json'
+                ]
             },
             module: {
                 rules: [{
