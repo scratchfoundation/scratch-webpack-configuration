@@ -3,6 +3,8 @@ const path = require('path');
 const merge = require('lodash.merge');
 const nodeExternals = require('webpack-node-externals');
 
+const DEFAULT_CHUNK_FILENAME = 'chunks/[name].[chunkhash].js';
+
 /**
  * @typedef {import('webpack').Configuration} Configuration
  * @typedef {import('webpack').RuleSetRule} RuleSetRule
@@ -51,11 +53,17 @@ class ScratchWebpackConfigBuilder {
                 [libraryName]: path.resolve(this._srcPath, 'index')
             } : path.resolve(this._srcPath, 'index'),
             optimization: {
-                minimize: isProduction
+                minimize: isProduction,
+                splitChunks: {
+                    chunks: 'all',
+                    filename: DEFAULT_CHUNK_FILENAME
+                },
+                mergeDuplicateChunks: true
             },
             output: {
                 clean: true,
                 filename: '[name].js',
+                chunkFilename: DEFAULT_CHUNK_FILENAME,
                 path: this._distPath,
                 library: {
                     name: libraryName,
