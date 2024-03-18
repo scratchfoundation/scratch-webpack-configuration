@@ -87,18 +87,45 @@ class ScratchWebpackConfigBuilder {
                 ]
             },
             module: {
-                rules: [{
-                    test: enableReact ? /\.[cm]?jsx?$/ : /\.[cm]?js$/,
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            '@babel/preset-env',
-                            ...(
-                                enableReact ? ['@babel/preset-react'] : []
-                            )
-                        ]
+                rules: [
+                    {
+                        test: enableReact ? /\.[cm]?jsx?$/ : /\.[cm]?js$/,
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                '@babel/preset-env',
+                                ...(
+                                    enableReact ? ['@babel/preset-react'] : []
+                                )
+                            ]
+                        }
+                    },
+                    {
+                        // `asset` automatically chooses between exporting a data URI and emitting a separate file.
+                        // Previously achievable by using `url-loader` with asset size limit.
+                        resourceQuery: /^\?asset$/,
+                        type: 'asset'
+                    },
+                    {
+                        // `asset/resource` emits a separate file and exports the URL.
+                        // Previously achievable by using `file-loader`.
+                        resourceQuery: /^\?(resource|file)$/,
+                        type: 'asset/resource'
+                    },
+                    {
+                        // `asset/inline` exports a data URI of the asset.
+                        // Previously achievable by using `url-loader`.
+                        resourceQuery: /^\?(inline|url)$/,
+                        type: 'asset/inline'
+                    },
+                    {
+                        // `asset/source` exports the source code of the asset.
+                        // Previously achievable by using `raw-loader`.
+                        resourceQuery: /^\?(source|raw)$/,
+                        type: 'asset/source'
                     }
-                }]
+                ],
+
             },
             plugins: []
         };

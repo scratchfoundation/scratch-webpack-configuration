@@ -68,6 +68,21 @@ module.exports = [
   - `node` builds to `dist/node/`
 - Supports merging in arbitrary configuration with `merge({...})`
 
+### Asset Modules
+
+This configuration makes webpack 5's [Asset Modules](https://webpack.js.org/guides/asset-modules/) available through
+resource queries parameters:
+
+```js
+import myImage from './my-image.png?asset'; // Use `asset` (let webpack decide)
+import myImage from './my-image.png?resource'; // Use `asset/resource`, similar to `file-loader`
+import myImage from './my-image.png?inline'; // Use `asset/inline`, similar to `url-loader`
+import myImage from './my-image.png?source'; // Use `asset/source`, similar to `raw-loader`
+```
+
+You can also use `file` for `asset/resource`, `url` for `asset/inline`, and `raw` for `asset/source`, to make it clear
+which loader you're replacing.
+
 ## API
 
 ### `new ScratchWebpackConfigBuilder(options)`
