@@ -162,6 +162,23 @@ class ScratchWebpackConfigBuilder {
     }
 
     /**
+     * Enable the webpack dev server. Probably only useful for web targets.
+     * @param {string|number} [port='auto'] The port to listen on, or `'auto'` to use a random port.
+     * @returns {this}
+     */
+    enableDevServer (port = 'auto') {
+        return this.merge({
+            devServer: {
+                client: {
+                    overlay: true,
+                    progress: true
+                },
+                port
+            }
+        });
+    }
+
+    /**
      * Add a new rule to `module.rules` in the current configuration object.
      * @param {RuleSetRule} rule The rule to add.
      * @returns {this}
