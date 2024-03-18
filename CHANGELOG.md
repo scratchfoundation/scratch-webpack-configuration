@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.2.0...v1.3.0) (2024-03-18)
+
+
+### Features
+
+* add "enableDevServer" helper ([44c7765](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/44c77658baeafaa715354e5de884cfefbc74d278))
+* add chunk splitting ([c1046e9](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/c1046e9a91c778bb237a0a4214ebcd95d5bc188c))
+* add rules for asset modules ([bde30f6](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/bde30f62b08697dee68a2750cf5b2650699eaf67))
+
 # [1.2.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.1.0...v1.2.0) (2024-03-14)
 
 
