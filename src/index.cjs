@@ -33,9 +33,9 @@ class ScratchWebpackConfigBuilder {
      * @param {boolean} [options.enableReact] Whether to enable React and JSX support.
      * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
-     * @param {boolean} [options.shouldSplitChunks] Whether to enable optimization.
+     * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
      */
-    constructor({ distPath, enableReact, libraryName, rootPath, srcPath, shouldSplitChunks}) {
+    constructor ({ distPath, enableReact, libraryName, rootPath, srcPath, shouldSplitChunks}) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
