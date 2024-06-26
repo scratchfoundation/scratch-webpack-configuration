@@ -35,7 +35,7 @@ class ScratchWebpackConfigBuilder {
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
      * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
      */
-    constructor ({ distPath, enableReact, libraryName, rootPath, srcPath, shouldSplitChunks}) {
+    constructor ({ distPath, enableReact, libraryName, rootPath, srcPath, shouldSplitChunks }) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
