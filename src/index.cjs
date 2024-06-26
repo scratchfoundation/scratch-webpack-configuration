@@ -33,9 +33,9 @@ class ScratchWebpackConfigBuilder {
      * @param {boolean} [options.enableReact] Whether to enable React and JSX support.
      * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
-     * @param {boolean} [options.shouldOptimize] Whether to enable optimization.
+     * @param {boolean} [options.shouldSplitChunks] Whether to enable optimization.
      */
-    constructor({ distPath, enableReact, libraryName, rootPath, srcPath, shouldOptimize}) {
+    constructor({ distPath, enableReact, libraryName, rootPath, srcPath, shouldSplitChunks}) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
@@ -43,7 +43,7 @@ class ScratchWebpackConfigBuilder {
         this._rootPath = toPath(rootPath) || '.'; // '.' will cause a webpack error since src must be absolute
         this._srcPath = toPath(srcPath) ?? path.resolve(this._rootPath, 'src');
         this._distPath = toPath(distPath) ?? path.resolve(this._rootPath, 'dist');
-        this._shouldOptimize = shouldOptimize
+        this._shouldSplitChunks = shouldSplitChunks
 
         /**
          * @type {Configuration}
@@ -54,16 +54,18 @@ class ScratchWebpackConfigBuilder {
             entry: libraryName ? {
                 [libraryName]: path.resolve(this._srcPath, 'index')
             } : path.resolve(this._srcPath, 'index'),
-            optimization: shouldOptimize
-                ? {
-                      minimize: isProduction,
-                      splitChunks: {
-                          chunks: 'all',
-                          filename: DEFAULT_CHUNK_FILENAME,
-                      },
-                      mergeDuplicateChunks: true,
-                  }
-                : {},
+            optimization: {
+                minimize: isProduction,
+                ...(
+                    shouldSplitChunks ? {
+                        splitChunks: {
+                            chunks: 'all',
+                            filename: DEFAULT_CHUNK_FILENAME,
+                        },
+                        mergeDuplicateChunks: true
+                    } : {}
+                )
+            },
             output: {
                 clean: true,
                 filename: '[name].js',
@@ -150,7 +152,7 @@ class ScratchWebpackConfigBuilder {
             rootPath: this._rootPath,
             srcPath: this._srcPath,
             distPath: this._distPath,
-            shouldOptimize: this._shouldOptimize
+            shouldSplitChunks: this._shouldSplitChunks
         }).merge(this._config);
     }
 
