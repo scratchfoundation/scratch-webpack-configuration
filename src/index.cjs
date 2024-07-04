@@ -100,7 +100,7 @@ class ScratchWebpackConfigBuilder {
                         exclude: [
                             {
                                 and: [/node_modules/],
-                                not: [/node_modules\/scratch-/]
+                                not: [/node_modules[\\/].*scratch/]
                             }
                         ],
                         options: {
