@@ -135,7 +135,52 @@ class ScratchWebpackConfigBuilder {
                         // Previously achievable by using `raw-loader`.
                         resourceQuery: /^\?(source|raw)$/,
                         type: 'asset/source'
-                    }
+                    },
+                    {
+                        test: /\.hex$/,
+                        use: [{
+                            loader: 'url-loader',
+                            options: {
+                                limit: 16 * 1024
+                            }
+                        }]
+                    },
+                    ...(
+                        enableReact ? [
+                            {
+                                test: /\.css$/,
+                                use: [
+                                    {
+                                        loader: 'style-loader'
+                                    },
+                                    {
+                                        loader: 'css-loader',
+                                        options: {
+                                            modules: {
+                                                namedExport: false,
+                                                localIdentName: '[name]_[local]_[hash:base64:5]',
+                                                exportLocalsConvention: 'camelCase'
+                                            },
+                                            importLoaders: 1,
+                                            esModule: false
+                                        }
+                                    },
+                                    {
+                                        loader: 'postcss-loader',
+                                        options: {
+                                            postcssOptions: {
+                                                plugins: [
+                                                    'postcss-import',
+                                                    'postcss-simple-vars',
+                                                    'autoprefixer'
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ] : []
+                    )
                 ],
 
             },
