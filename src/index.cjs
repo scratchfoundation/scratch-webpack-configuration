@@ -2,6 +2,7 @@ const path = require('path');
 
 const merge = require('lodash.merge');
 const nodeExternals = require('webpack-node-externals');
+const webpack = require('webpack');
 
 const DEFAULT_CHUNK_FILENAME = 'chunks/[name].[chunkhash].js';
 
@@ -184,7 +185,11 @@ class ScratchWebpackConfigBuilder {
                 ],
 
             },
-            plugins: []
+            plugins: [
+                new webpack.ProvidePlugin({
+                    Buffer: ['buffer', 'Buffer']
+                })
+            ]
         };
     }
 
