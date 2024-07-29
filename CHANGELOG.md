@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.3.0...v1.4.0) (2024-07-29)
+
+
+### Bug Fixes
+
+* [UEPR-30] Updated style-loader version to fix component not rendering ([12350ed](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/12350eda5774dbbaeded5e83e6f2a4aac70707bc))
+
+
+### Features
+
+* [UEPR-27] Moved common rules to shared webpack configuration ([8693636](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/8693636e6dac0d305bade76d2056d2be7bf0e13c))
+
 # [1.3.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.2.0...v1.3.0) (2024-03-18)
 
 
