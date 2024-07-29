@@ -2,6 +2,7 @@ const path = require('path');
 
 const merge = require('lodash.merge');
 const nodeExternals = require('webpack-node-externals');
+const webpack = require('webpack');
 
 const DEFAULT_CHUNK_FILENAME = 'chunks/[name].[chunkhash].js';
 
@@ -33,8 +34,9 @@ class ScratchWebpackConfigBuilder {
      * @param {boolean} [options.enableReact] Whether to enable React and JSX support.
      * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
+     * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
      */
-    constructor ({distPath, enableReact, libraryName, rootPath, srcPath}) {
+    constructor ({ distPath, enableReact, libraryName, rootPath, srcPath, shouldSplitChunks }) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
@@ -42,6 +44,7 @@ class ScratchWebpackConfigBuilder {
         this._rootPath = toPath(rootPath) || '.'; // '.' will cause a webpack error since src must be absolute
         this._srcPath = toPath(srcPath) ?? path.resolve(this._rootPath, 'src');
         this._distPath = toPath(distPath) ?? path.resolve(this._rootPath, 'dist');
+        this._shouldSplitChunks = shouldSplitChunks
 
         /**
          * @type {Configuration}
@@ -54,11 +57,15 @@ class ScratchWebpackConfigBuilder {
             } : path.resolve(this._srcPath, 'index'),
             optimization: {
                 minimize: isProduction,
-                splitChunks: {
-                    chunks: 'all',
-                    filename: DEFAULT_CHUNK_FILENAME
-                },
-                mergeDuplicateChunks: true
+                ...(
+                    shouldSplitChunks ? {
+                        splitChunks: {
+                            chunks: 'all',
+                            filename: DEFAULT_CHUNK_FILENAME,
+                        },
+                        mergeDuplicateChunks: true
+                    } : {}
+                )
             },
             output: {
                 clean: true,
@@ -91,6 +98,12 @@ class ScratchWebpackConfigBuilder {
                     {
                         test: enableReact ? /\.[cm]?jsx?$/ : /\.[cm]?js$/,
                         loader: 'babel-loader',
+                        exclude: [
+                            {
+                                and: [/node_modules/],
+                                not: [/node_modules[\\/].*scratch/]
+                            }
+                        ],
                         options: {
                             presets: [
                                 '@babel/preset-env',
@@ -123,11 +136,60 @@ class ScratchWebpackConfigBuilder {
                         // Previously achievable by using `raw-loader`.
                         resourceQuery: /^\?(source|raw)$/,
                         type: 'asset/source'
-                    }
+                    },
+                    {
+                        test: /\.hex$/,
+                        use: [{
+                            loader: 'url-loader',
+                            options: {
+                                limit: 16 * 1024
+                            }
+                        }]
+                    },
+                    ...(
+                        enableReact ? [
+                            {
+                                test: /\.css$/,
+                                use: [
+                                    {
+                                        loader: 'style-loader'
+                                    },
+                                    {
+                                        loader: 'css-loader',
+                                        options: {
+                                            modules: {
+                                                namedExport: false,
+                                                localIdentName: '[name]_[local]_[hash:base64:5]',
+                                                exportLocalsConvention: 'camelCase'
+                                            },
+                                            importLoaders: 1,
+                                            esModule: false
+                                        }
+                                    },
+                                    {
+                                        loader: 'postcss-loader',
+                                        options: {
+                                            postcssOptions: {
+                                                plugins: [
+                                                    'postcss-import',
+                                                    'postcss-simple-vars',
+                                                    'autoprefixer'
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ] : []
+                    )
                 ],
 
             },
-            plugins: []
+            plugins: [
+                new webpack.ProvidePlugin({
+                    Buffer: ['buffer', 'Buffer']
+                })
+            ]
         };
     }
 
@@ -139,7 +201,8 @@ class ScratchWebpackConfigBuilder {
             libraryName: this._libraryName,
             rootPath: this._rootPath,
             srcPath: this._srcPath,
-            distPath: this._distPath
+            distPath: this._distPath,
+            shouldSplitChunks: this._shouldSplitChunks
         }).merge(this._config);
     }
 
