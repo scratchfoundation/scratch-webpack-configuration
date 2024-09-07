@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.4.0...v1.5.0) (2024-09-07)
+
+
+### Features
+
+* support arraybuffer-loader through `?arrayBuffer` resource query ([2a263ff](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/2a263ff6e5f7cf895fac09d42866f3b6cf912e7f))
+
 # [1.4.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.3.0...v1.4.0) (2024-07-29)
 
 
