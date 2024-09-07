@@ -5,6 +5,7 @@ const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 
 const DEFAULT_CHUNK_FILENAME = 'chunks/[name].[chunkhash].js';
+const DEFAULT_ASSET_FILENAME = 'assets/[name].[hash][ext][query]';
 
 /**
  * @typedef {import('webpack').Configuration} Configuration
@@ -70,6 +71,7 @@ class ScratchWebpackConfigBuilder {
             output: {
                 clean: true,
                 filename: '[name].js',
+                assetModuleFilename: DEFAULT_ASSET_FILENAME,
                 chunkFilename: DEFAULT_CHUNK_FILENAME,
                 path: this._distPath,
                 library: {
@@ -116,18 +118,21 @@ class ScratchWebpackConfigBuilder {
                     {
                         // `asset` automatically chooses between exporting a data URI and emitting a separate file.
                         // Previously achievable by using `url-loader` with asset size limit.
-                        resourceQuery: /^\?asset$/,
+                        // If file output is chosen, it is saved with the default asset module filename.
+                        resourceQuery: '?asset',
                         type: 'asset'
                     },
                     {
                         // `asset/resource` emits a separate file and exports the URL.
                         // Previously achievable by using `file-loader`.
+                        // Output is saved with the default asset module filename.
                         resourceQuery: /^\?(resource|file)$/,
                         type: 'asset/resource'
                     },
                     {
                         // `asset/inline` exports a data URI of the asset.
                         // Previously achievable by using `url-loader`.
+                        // Because the file is inlined, there is no filename.
                         resourceQuery: /^\?(inline|url)$/,
                         type: 'asset/inline'
                     },
@@ -135,7 +140,17 @@ class ScratchWebpackConfigBuilder {
                         // `asset/source` exports the source code of the asset.
                         // Previously achievable by using `raw-loader`.
                         resourceQuery: /^\?(source|raw)$/,
-                        type: 'asset/source'
+                        type: 'asset/source',
+                        generator: {
+                            // This filename seems unused, but if it ever gets used,
+                            // its extension should not match the asset's extension.
+                            filename: DEFAULT_ASSET_FILENAME + '.js'
+                        }
+                    },
+                    {
+                        resourceQuery: '?arrayBuffer',
+                        type: 'javascript/auto',
+                        use: 'arraybuffer-loader'
                     },
                     {
                         test: /\.hex$/,
