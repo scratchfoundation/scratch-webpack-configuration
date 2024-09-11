@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.1](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.5.0...v1.5.1) (2024-09-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency scratch-semantic-release-config to v1.0.16 ([22b5fb3](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/22b5fb3bcfb4df3a4f06eb6f82398771fab8bbd7))
+
 # [1.5.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.4.0...v1.5.0) (2024-09-07)
 
 
