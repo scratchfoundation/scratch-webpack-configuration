@@ -37,7 +37,7 @@ class ScratchWebpackConfigBuilder {
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
      * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
      */
-    constructor ({ distPath, enableReact, libraryName, rootPath, srcPath, shouldSplitChunks }) {
+    constructor ({ distPath, enableReact, enableTs, libraryName, rootPath, srcPath, shouldSplitChunks }) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
@@ -90,6 +90,7 @@ class ScratchWebpackConfigBuilder {
                             '.jsx'
                         ] : []
                     ),
+                    ...(enableTs ? ['.ts', '.tsx'] : []),
                     // webpack supports '...' to include defaults, but eslint does not
                     '.js',
                     '.json'
@@ -98,7 +99,9 @@ class ScratchWebpackConfigBuilder {
             module: {
                 rules: [
                     {
-                        test: enableReact ? /\.[cm]?jsx?$/ : /\.[cm]?js$/,
+                        test: enableReact ?
+                            (enableTs ? /\.[cm]?[jt]sx?$/ : /\.[cm]?jsx?$/) :
+                            (enableTs ? /\.[cm]?[jt]s$/ : /\.[cm]?js$/),
                         loader: 'babel-loader',
                         exclude: [
                             {
@@ -196,7 +199,12 @@ class ScratchWebpackConfigBuilder {
                                 ]
                             }
                         ] : []
-                    )
+                    ),
+                    ...(enableTs ? [{
+                        test: enableReact ? /\.[cm]?[jt]sx?$/ : /\.[cm]?[jt]s$/,
+                        loader: 'ts-loader',
+                        exclude: [/node_modules/]
+                    }] : []),
                 ],
 
             },
