@@ -247,6 +247,16 @@ class ScratchWebpackConfigBuilder {
     }
 
     /**
+     * Append new externals to the current configuration object.
+     * @param {string[]} externals Externals to add.
+     * @returns {this}
+     */
+    addExternals(externals) {
+        this._config = this._config.externals.concat(externals);
+        return this;
+    }
+
+    /**
      * Set the target environment for this configuration.
      * @param {string} target The target environment, like `node`, `browserslist`, etc.
      * @returns {this}
