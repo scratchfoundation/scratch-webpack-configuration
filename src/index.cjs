@@ -214,12 +214,11 @@ class ScratchWebpackConfigBuilder {
                         ] : []
                     ),
                     ...(enableTs ? [{
-                        test: enableReact ? /\.[cm]?[jt]sx?$/ : /\.[cm]?[jt]s$/,
+                        test: enableReact ? /\.[cm]?tsx?$/ : /\.[cm]?ts$/,
                         loader: 'ts-loader',
                         exclude: [/node_modules/]
                     }] : []),
                 ],
-
             },
             plugins: [
                 new webpack.ProvidePlugin({
