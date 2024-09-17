@@ -264,7 +264,7 @@ class ScratchWebpackConfigBuilder {
      * @returns {this}
      */
     addExternals(externals) {
-        this._config = this._config.externals.concat(externals);
+        this._config.externals = (this._config.externals ?? []).concat(externals);
         return this;
     }
 
