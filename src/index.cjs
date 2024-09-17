@@ -115,7 +115,11 @@ class ScratchWebpackConfigBuilder {
                         exclude: [
                             {
                                 and: [/node_modules/],
-                                not: [/node_modules[\\/].*scratch/]
+
+                                // Scratch-paint points to its source (instead of a pre-built version)
+                                // for its browser target. So we need to process it (at the minimum to resolve
+                                // the JSX syntax).
+                                not: [/node_modules[\\/]scratch-paint\//]
                             }
                         ],
                         options: {
