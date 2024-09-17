@@ -3,6 +3,7 @@ const path = require('path');
 const merge = require('lodash.merge');
 const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
+const TerserPlugin = require("terser-webpack-plugin")
 
 const DEFAULT_CHUNK_FILENAME = 'chunks/[name].[chunkhash].js';
 const DEFAULT_ASSET_FILENAME = 'assets/[name].[hash][ext][query]';
@@ -58,6 +59,14 @@ class ScratchWebpackConfigBuilder {
             } : path.resolve(this._srcPath, 'index'),
             optimization: {
                 minimize: isProduction,
+                minimizer: [
+                    new TerserPlugin({
+                        // Limiting Terser to use only 2 threads. At least for building scratch-gui
+                        // this results in a performance gain (from ~60s to ~36s) on a MacBook with
+                        // M1 Pro and 32GB of RAM and halving the memory usage (from ~11GB at peaks to ~6GB)
+                        parallel: 2
+                    })
+                ],
                 ...(
                     shouldSplitChunks ? {
                         splitChunks: {
