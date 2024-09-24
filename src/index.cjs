@@ -31,14 +31,15 @@ const toPath = path => {
 class ScratchWebpackConfigBuilder {
     /**
      * @param {object} options Options for the webpack configuration.
-     * @param {string|URL} options.rootPath The absolute path to the project root.
+     * @param {string|URL} [options.rootPath] The absolute path to the project root.
      * @param {string|URL} [options.distPath] The absolute path to build output. Defaults to `dist` under `rootPath`.
+     * @param {string|URL} [options.publicPath] The public location where the output assets will be located. Defaults to `/`.
      * @param {boolean} [options.enableReact] Whether to enable React and JSX support.
      * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
      * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
      */
-    constructor ({ distPath, enableReact, enableTs, libraryName, rootPath, srcPath, shouldSplitChunks }) {
+    constructor ({ distPath, enableReact, enableTs, libraryName, rootPath, srcPath, publicPath = '/', shouldSplitChunks }) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
@@ -83,6 +84,8 @@ class ScratchWebpackConfigBuilder {
                 assetModuleFilename: DEFAULT_ASSET_FILENAME,
                 chunkFilename: DEFAULT_CHUNK_FILENAME,
                 path: this._distPath,
+                // See https://github.com/scratchfoundation/scratch-editor/pull/25/files/9bc537f9bce35ee327b74bd6715d6c5140f73937#r1763073684
+                publicPath,
                 library: {
                     name: libraryName,
                     type: 'umd2'
