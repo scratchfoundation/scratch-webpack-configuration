@@ -116,10 +116,10 @@ class ScratchWebpackConfigBuilder {
                             {
                                 and: [/node_modules/],
 
-                                // Scratch-paint points to its source (instead of a pre-built version)
-                                // for its browser target. So we need to process it (at the minimum to resolve
-                                // the JSX syntax).
-                                not: [/node_modules[\\/]scratch-paint\//]
+                                // Some scratch pakcages point to their source (as opposed to a pre-built version)
+                                // for their browser or webpack target. So we need to process them (at the minimum
+                                // to resolve the JSX syntax).
+                                not: [/node_modules[\\/]scratch-(paint|render|svg-renderer|vm)[\\/]src[\\/]/]
                             }
                         ],
                         options: {
