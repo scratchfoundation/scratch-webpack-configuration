@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.5.1...v1.6.0) (2024-09-25)
+
+
+### Bug Fixes
+
+* update the file match that webpack should process from node_modules ([89d4f7d](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/89d4f7de4cb60ab9f262bfb5e765d67c7fc367a1))
+
+
+### Features
+
+* add method for defining additional externals ([56c3806](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/56c38066111ec5d67d1faf39dc4ddaea5a091f90))
+* add TS support ([348a60a](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/348a60a0744bd881da3de792b900d9ec76e4eead))
+* default to publicPath: '/' and allow overrides ([ec47b45](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/ec47b45ea04b884b75b1b7df9a1cf3acff9443fb))
+
 ## [1.5.1](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.5.0...v1.5.1) (2024-09-11)
 
 
