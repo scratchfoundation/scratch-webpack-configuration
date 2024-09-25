@@ -3,6 +3,7 @@ const path = require('path');
 const merge = require('lodash.merge');
 const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
+const TerserPlugin = require("terser-webpack-plugin")
 
 const DEFAULT_CHUNK_FILENAME = 'chunks/[name].[chunkhash].js';
 const DEFAULT_ASSET_FILENAME = 'assets/[name].[hash][ext][query]';
@@ -30,14 +31,15 @@ const toPath = path => {
 class ScratchWebpackConfigBuilder {
     /**
      * @param {object} options Options for the webpack configuration.
-     * @param {string|URL} options.rootPath The absolute path to the project root.
+     * @param {string|URL} [options.rootPath] The absolute path to the project root.
      * @param {string|URL} [options.distPath] The absolute path to build output. Defaults to `dist` under `rootPath`.
+     * @param {string|URL} [options.publicPath] The public location where the output assets will be located. Defaults to `/`.
      * @param {boolean} [options.enableReact] Whether to enable React and JSX support.
      * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
      * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
      */
-    constructor ({ distPath, enableReact, libraryName, rootPath, srcPath, shouldSplitChunks }) {
+    constructor ({ distPath, enableReact, enableTs, libraryName, rootPath, srcPath, publicPath = '/', shouldSplitChunks }) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
@@ -58,6 +60,14 @@ class ScratchWebpackConfigBuilder {
             } : path.resolve(this._srcPath, 'index'),
             optimization: {
                 minimize: isProduction,
+                minimizer: [
+                    new TerserPlugin({
+                        // Limiting Terser to use only 2 threads. At least for building scratch-gui
+                        // this results in a performance gain (from ~60s to ~36s) on a MacBook with
+                        // M1 Pro and 32GB of RAM and halving the memory usage (from ~11GB at peaks to ~6GB)
+                        parallel: 2
+                    })
+                ],
                 ...(
                     shouldSplitChunks ? {
                         splitChunks: {
@@ -74,6 +84,8 @@ class ScratchWebpackConfigBuilder {
                 assetModuleFilename: DEFAULT_ASSET_FILENAME,
                 chunkFilename: DEFAULT_CHUNK_FILENAME,
                 path: this._distPath,
+                // See https://github.com/scratchfoundation/scratch-editor/pull/25/files/9bc537f9bce35ee327b74bd6715d6c5140f73937#r1763073684
+                publicPath,
                 library: {
                     name: libraryName,
                     type: 'umd2'
@@ -90,6 +102,7 @@ class ScratchWebpackConfigBuilder {
                             '.jsx'
                         ] : []
                     ),
+                    ...(enableTs ? ['.ts', '.tsx'] : []),
                     // webpack supports '...' to include defaults, but eslint does not
                     '.js',
                     '.json'
@@ -98,12 +111,18 @@ class ScratchWebpackConfigBuilder {
             module: {
                 rules: [
                     {
-                        test: enableReact ? /\.[cm]?jsx?$/ : /\.[cm]?js$/,
+                        test: enableReact ?
+                            (enableTs ? /\.[cm]?[jt]sx?$/ : /\.[cm]?jsx?$/) :
+                            (enableTs ? /\.[cm]?[jt]s$/ : /\.[cm]?js$/),
                         loader: 'babel-loader',
                         exclude: [
                             {
                                 and: [/node_modules/],
-                                not: [/node_modules[\\/].*scratch/]
+
+                                // Some scratch pakcages point to their source (as opposed to a pre-built version)
+                                // for their browser or webpack target. So we need to process them (at the minimum
+                                // to resolve the JSX syntax).
+                                not: [/node_modules[\\/]scratch-(paint|render|svg-renderer|vm)[\\/]src[\\/]/]
                             }
                         ],
                         options: {
@@ -196,9 +215,13 @@ class ScratchWebpackConfigBuilder {
                                 ]
                             }
                         ] : []
-                    )
+                    ),
+                    ...(enableTs ? [{
+                        test: enableReact ? /\.[cm]?tsx?$/ : /\.[cm]?ts$/,
+                        loader: 'ts-loader',
+                        exclude: [/node_modules/]
+                    }] : []),
                 ],
-
             },
             plugins: [
                 new webpack.ProvidePlugin({
@@ -235,6 +258,16 @@ class ScratchWebpackConfigBuilder {
      */
     merge(overrides) {
         merge(this._config, overrides);
+        return this;
+    }
+
+    /**
+     * Append new externals to the current configuration object.
+     * @param {string[]} externals Externals to add.
+     * @returns {this}
+     */
+    addExternals(externals) {
+        this._config.externals = (this._config.externals ?? []).concat(externals);
         return this;
     }
 
