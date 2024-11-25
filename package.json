@@ -17,7 +17,7 @@
     "webpack"
   ],
   "author": "Scratch Foundation",
-  "license": "AGPL-3.0-only",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/scratchfoundation/scratch-webpack-configuration/issues"
   },
