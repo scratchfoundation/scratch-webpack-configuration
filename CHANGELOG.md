@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v2.0.0...v3.0.0) (2024-11-25)
+
+
+* chore!: set license to BSD-3-Clause ([3131686](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/3131686f4fcdd91916f33af3e59fdaeacb425664))
+
+
+### BREAKING CHANGES
+
+* The license for this project has changed back to BSD-3-Clause
+
 # [2.0.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.6.0...v2.0.0) (2024-11-25)
 
 
