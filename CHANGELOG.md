@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.6.0...v2.0.0) (2024-11-25)
+
+
+* chore!: set license to AGPL-3.0-only ([66e2456](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/66e2456649350eab6c56f0d6255f3a65d6876eb1))
+
+
+### BREAKING CHANGES
+
+* This project is now licensed under the AGPL version 3.0
+
+See https://www.scratchfoundation.org/open-source-license
+
 # [1.6.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.5.1...v1.6.0) (2024-09-25)
 
 
