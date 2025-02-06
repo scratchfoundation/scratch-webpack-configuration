@@ -91,6 +91,11 @@ class ScratchWebpackConfigBuilder {
                     {
                         test: enableReact ? /\.[cm]?jsx?$/ : /\.[cm]?js$/,
                         loader: 'babel-loader',
+                        include: enableReact ? [
+                            path.join(__dirname, 'node_modules/react-intl'),
+                            path.join(__dirname, 'node_modules/intl-messageformat'),
+                            path.join(__dirname, 'node_modules/intl-messageformat-parser')
+                        ] : [],
                         options: {
                             presets: [
                                 '@babel/preset-env',
