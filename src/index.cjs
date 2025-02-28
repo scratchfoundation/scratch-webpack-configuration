@@ -122,7 +122,10 @@ class ScratchWebpackConfigBuilder {
                                 // Some scratch pakcages point to their source (as opposed to a pre-built version)
                                 // for their browser or webpack target. So we need to process them (at the minimum
                                 // to resolve the JSX syntax).
-                                not: [/node_modules[\\/]scratch-(paint|render|svg-renderer|vm)[\\/]src[\\/]/]
+                                not: [
+                                    /node_modules[\\/]scratch-(paint|render|svg-renderer|vm)[\\/]src[\\/]/,
+                                    path.resolve(this._rootPath) // Include the project's root even if in node_modules
+                                ]
                             }
                         ],
                         options: {
