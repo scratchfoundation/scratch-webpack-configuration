@@ -2,8 +2,11 @@ const path = require('path');
 
 const merge = require('lodash.merge');
 const nodeExternals = require('webpack-node-externals');
+const webpack = require('webpack');
+const TerserPlugin = require("terser-webpack-plugin")
 
 const DEFAULT_CHUNK_FILENAME = 'chunks/[name].[chunkhash].js';
+const DEFAULT_ASSET_FILENAME = 'assets/[name].[hash][ext][query]';
 
 /**
  * @typedef {import('webpack').Configuration} Configuration
@@ -28,13 +31,15 @@ const toPath = path => {
 class ScratchWebpackConfigBuilder {
     /**
      * @param {object} options Options for the webpack configuration.
-     * @param {string|URL} options.rootPath The absolute path to the project root.
+     * @param {string|URL} [options.rootPath] The absolute path to the project root.
      * @param {string|URL} [options.distPath] The absolute path to build output. Defaults to `dist` under `rootPath`.
+     * @param {string|URL} [options.publicPath] The public location where the output assets will be located. Defaults to `/`.
      * @param {boolean} [options.enableReact] Whether to enable React and JSX support.
      * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
+     * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
      */
-    constructor ({distPath, enableReact, libraryName, rootPath, srcPath}) {
+    constructor ({ distPath, enableReact, enableTs, libraryName, rootPath, srcPath, publicPath = '/', shouldSplitChunks }) {
         const isProduction = process.env.NODE_ENV === 'production';
         const mode = isProduction ? 'production' : 'development';
 
@@ -42,6 +47,7 @@ class ScratchWebpackConfigBuilder {
         this._rootPath = toPath(rootPath) || '.'; // '.' will cause a webpack error since src must be absolute
         this._srcPath = toPath(srcPath) ?? path.resolve(this._rootPath, 'src');
         this._distPath = toPath(distPath) ?? path.resolve(this._rootPath, 'dist');
+        this._shouldSplitChunks = shouldSplitChunks
 
         /**
          * @type {Configuration}
@@ -54,17 +60,32 @@ class ScratchWebpackConfigBuilder {
             } : path.resolve(this._srcPath, 'index'),
             optimization: {
                 minimize: isProduction,
-                splitChunks: {
-                    chunks: 'all',
-                    filename: DEFAULT_CHUNK_FILENAME
-                },
-                mergeDuplicateChunks: true
+                minimizer: [
+                    new TerserPlugin({
+                        // Limiting Terser to use only 2 threads. At least for building scratch-gui
+                        // this results in a performance gain (from ~60s to ~36s) on a MacBook with
+                        // M1 Pro and 32GB of RAM and halving the memory usage (from ~11GB at peaks to ~6GB)
+                        parallel: 2
+                    })
+                ],
+                ...(
+                    shouldSplitChunks ? {
+                        splitChunks: {
+                            chunks: 'all',
+                            filename: DEFAULT_CHUNK_FILENAME,
+                        },
+                        mergeDuplicateChunks: true
+                    } : {}
+                )
             },
             output: {
                 clean: true,
                 filename: '[name].js',
+                assetModuleFilename: DEFAULT_ASSET_FILENAME,
                 chunkFilename: DEFAULT_CHUNK_FILENAME,
                 path: this._distPath,
+                // See https://github.com/scratchfoundation/scratch-editor/pull/25/files/9bc537f9bce35ee327b74bd6715d6c5140f73937#r1763073684
+                publicPath,
                 library: {
                     name: libraryName,
                     type: 'umd2'
@@ -81,6 +102,7 @@ class ScratchWebpackConfigBuilder {
                             '.jsx'
                         ] : []
                     ),
+                    ...(enableTs ? ['.ts', '.tsx'] : []),
                     // webpack supports '...' to include defaults, but eslint does not
                     '.js',
                     '.json'
@@ -89,13 +111,25 @@ class ScratchWebpackConfigBuilder {
             module: {
                 rules: [
                     {
-                        test: enableReact ? /\.[cm]?jsx?$/ : /\.[cm]?js$/,
+                        test: enableReact ?
+                            (enableTs ? /\.[cm]?[jt]sx?$/ : /\.[cm]?jsx?$/) :
+                            (enableTs ? /\.[cm]?[jt]s$/ : /\.[cm]?js$/),
                         loader: 'babel-loader',
                         include: enableReact ? [
                             path.join(__dirname, 'node_modules/react-intl'),
                             path.join(__dirname, 'node_modules/intl-messageformat'),
                             path.join(__dirname, 'node_modules/intl-messageformat-parser')
                         ] : [],
+                        exclude: [
+                            {
+                                and: [/node_modules/],
+
+                                // Some scratch pakcages point to their source (as opposed to a pre-built version)
+                                // for their browser or webpack target. So we need to process them (at the minimum
+                                // to resolve the JSX syntax).
+                                not: [/node_modules[\\/]scratch-(paint|render|svg-renderer|vm)[\\/]src[\\/]/]
+                            }
+                        ],
                         options: {
                             presets: [
                                 '@babel/preset-env',
@@ -108,18 +142,21 @@ class ScratchWebpackConfigBuilder {
                     {
                         // `asset` automatically chooses between exporting a data URI and emitting a separate file.
                         // Previously achievable by using `url-loader` with asset size limit.
-                        resourceQuery: /^\?asset$/,
+                        // If file output is chosen, it is saved with the default asset module filename.
+                        resourceQuery: '?asset',
                         type: 'asset'
                     },
                     {
                         // `asset/resource` emits a separate file and exports the URL.
                         // Previously achievable by using `file-loader`.
+                        // Output is saved with the default asset module filename.
                         resourceQuery: /^\?(resource|file)$/,
                         type: 'asset/resource'
                     },
                     {
                         // `asset/inline` exports a data URI of the asset.
                         // Previously achievable by using `url-loader`.
+                        // Because the file is inlined, there is no filename.
                         resourceQuery: /^\?(inline|url)$/,
                         type: 'asset/inline'
                     },
@@ -127,12 +164,75 @@ class ScratchWebpackConfigBuilder {
                         // `asset/source` exports the source code of the asset.
                         // Previously achievable by using `raw-loader`.
                         resourceQuery: /^\?(source|raw)$/,
-                        type: 'asset/source'
-                    }
+                        type: 'asset/source',
+                        generator: {
+                            // This filename seems unused, but if it ever gets used,
+                            // its extension should not match the asset's extension.
+                            filename: DEFAULT_ASSET_FILENAME + '.js'
+                        }
+                    },
+                    {
+                        resourceQuery: '?arrayBuffer',
+                        type: 'javascript/auto',
+                        use: 'arraybuffer-loader'
+                    },
+                    {
+                        test: /\.hex$/,
+                        use: [{
+                            loader: 'url-loader',
+                            options: {
+                                limit: 16 * 1024
+                            }
+                        }]
+                    },
+                    ...(
+                        enableReact ? [
+                            {
+                                test: /\.css$/,
+                                use: [
+                                    {
+                                        loader: 'style-loader'
+                                    },
+                                    {
+                                        loader: 'css-loader',
+                                        options: {
+                                            modules: {
+                                                namedExport: false,
+                                                localIdentName: '[name]_[local]_[hash:base64:5]',
+                                                exportLocalsConvention: 'camelCase'
+                                            },
+                                            importLoaders: 1,
+                                            esModule: false
+                                        }
+                                    },
+                                    {
+                                        loader: 'postcss-loader',
+                                        options: {
+                                            postcssOptions: {
+                                                plugins: [
+                                                    'postcss-import',
+                                                    'postcss-simple-vars',
+                                                    'autoprefixer'
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ] : []
+                    ),
+                    ...(enableTs ? [{
+                        test: enableReact ? /\.[cm]?tsx?$/ : /\.[cm]?ts$/,
+                        loader: 'ts-loader',
+                        exclude: [/node_modules/]
+                    }] : []),
                 ],
-
             },
-            plugins: []
+            plugins: [
+                new webpack.ProvidePlugin({
+                    Buffer: ['buffer', 'Buffer']
+                })
+            ]
         };
     }
 
@@ -144,7 +244,8 @@ class ScratchWebpackConfigBuilder {
             libraryName: this._libraryName,
             rootPath: this._rootPath,
             srcPath: this._srcPath,
-            distPath: this._distPath
+            distPath: this._distPath,
+            shouldSplitChunks: this._shouldSplitChunks
         }).merge(this._config);
     }
 
@@ -162,6 +263,16 @@ class ScratchWebpackConfigBuilder {
      */
     merge(overrides) {
         merge(this._config, overrides);
+        return this;
+    }
+
+    /**
+     * Append new externals to the current configuration object.
+     * @param {string[]} externals Externals to add.
+     * @returns {this}
+     */
+    addExternals(externals) {
+        this._config.externals = (this._config.externals ?? []).concat(externals);
         return this;
     }
 

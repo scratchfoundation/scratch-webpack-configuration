@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v2.0.0...v3.0.0) (2024-11-25)
+
+
+* chore!: set license to BSD-3-Clause ([3131686](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/3131686f4fcdd91916f33af3e59fdaeacb425664))
+
+
+### BREAKING CHANGES
+
+* The license for this project has changed back to BSD-3-Clause
+
+# [2.0.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.6.0...v2.0.0) (2024-11-25)
+
+
+* chore!: set license to AGPL-3.0-only ([66e2456](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/66e2456649350eab6c56f0d6255f3a65d6876eb1))
+
+
+### BREAKING CHANGES
+
+* This project is now licensed under the AGPL version 3.0
+
+See https://www.scratchfoundation.org/open-source-license
+
+# [1.6.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.5.1...v1.6.0) (2024-09-25)
+
+
+### Bug Fixes
+
+* update the file match that webpack should process from node_modules ([89d4f7d](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/89d4f7de4cb60ab9f262bfb5e765d67c7fc367a1))
+
+
+### Features
+
+* add method for defining additional externals ([56c3806](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/56c38066111ec5d67d1faf39dc4ddaea5a091f90))
+* add TS support ([348a60a](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/348a60a0744bd881da3de792b900d9ec76e4eead))
+* default to publicPath: '/' and allow overrides ([ec47b45](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/ec47b45ea04b884b75b1b7df9a1cf3acff9443fb))
+
+## [1.5.1](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.5.0...v1.5.1) (2024-09-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency scratch-semantic-release-config to v1.0.16 ([22b5fb3](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/22b5fb3bcfb4df3a4f06eb6f82398771fab8bbd7))
+
+# [1.5.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.4.0...v1.5.0) (2024-09-07)
+
+
+### Features
+
+* support arraybuffer-loader through `?arrayBuffer` resource query ([2a263ff](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/2a263ff6e5f7cf895fac09d42866f3b6cf912e7f))
+
+# [1.4.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.3.0...v1.4.0) (2024-07-29)
+
+
+### Bug Fixes
+
+* [UEPR-30] Updated style-loader version to fix component not rendering ([12350ed](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/12350eda5774dbbaeded5e83e6f2a4aac70707bc))
+
+
+### Features
+
+* [UEPR-27] Moved common rules to shared webpack configuration ([8693636](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/8693636e6dac0d305bade76d2056d2be7bf0e13c))
+
 # [1.3.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v1.2.0...v1.3.0) (2024-03-18)
 
 
