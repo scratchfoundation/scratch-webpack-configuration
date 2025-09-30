@@ -38,6 +38,7 @@ class ScratchWebpackConfigBuilder {
      * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
      * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
+     * @param {RegExp[]} [options.cssModuleExceptions] Optional array of regex rules that exclude matching CSS files from CSS module scoping.
      */
     constructor ({ distPath, enableReact, enableTs, libraryName, rootPath, srcPath, publicPath = '/', shouldSplitChunks, cssModuleExceptions = [] }) {
         const isProduction = process.env.NODE_ENV === 'production';
