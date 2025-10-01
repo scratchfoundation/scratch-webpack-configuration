@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v3.0.0...v3.1.0) (2025-10-01)
+
+
+### Bug Fixes
+
+* add cssModuleExceptions as [@param](https://github.com/param) ([7a4836f](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/7a4836fe12cd916a060123a7468160343d4b1184))
+
+
+### Features
+
+* allow for css module exceptions ([121295f](https://github.com/scratchfoundation/scratch-webpack-configuration/commit/121295f943f012d1cf26ea41d75d5bcce30ea20e))
+
 # [3.0.0](https://github.com/scratchfoundation/scratch-webpack-configuration/compare/v2.0.0...v3.0.0) (2024-11-25)
 
 
