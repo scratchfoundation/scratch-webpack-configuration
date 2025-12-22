@@ -116,6 +116,11 @@ class ScratchWebpackConfigBuilder {
                             (enableTs ? /\.[cm]?[jt]sx?$/ : /\.[cm]?jsx?$/) :
                             (enableTs ? /\.[cm]?[jt]s$/ : /\.[cm]?js$/),
                         loader: 'babel-loader',
+                        include: enableReact ? [
+                            path.join(__dirname, 'node_modules/react-intl'),
+                            path.join(__dirname, 'node_modules/intl-messageformat'),
+                            path.join(__dirname, 'node_modules/intl-messageformat-parser')
+                        ] : [],
                         exclude: [
                             {
                                 and: [/node_modules/],
