@@ -1,6 +1,6 @@
 {
   "name": "scratch-webpack-configuration",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Shared configuration for Scratch's use of webpack",
   "main": "src/index.cjs",
   "type": "commonjs",
