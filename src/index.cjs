@@ -35,6 +35,7 @@ class ScratchWebpackConfigBuilder {
      * @param {string|URL} [options.distPath] The absolute path to build output. Defaults to `dist` under `rootPath`.
      * @param {string|URL} [options.publicPath] The public location where the output assets will be located. Defaults to `/`.
      * @param {boolean} [options.enableReact] Whether to enable React and JSX support.
+     * @param {boolean} [options.enableTs] Whether to enable TypeScript support.
      * @param {string} [options.libraryName] The name of the library to build. Shorthand for `output.library.name`.
      * @param {string|URL} [options.srcPath] The absolute path to the source files. Defaults to `src` under `rootPath`.
      * @param {boolean} [options.shouldSplitChunks] Whether to enable spliting code to chunks.
